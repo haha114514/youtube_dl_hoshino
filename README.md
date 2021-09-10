@@ -2,6 +2,10 @@
 Hoshinobot调用YouTube_dl来下载YouTube/Twitter/Tiktok视频
 
 # 安装方法
+安装youtube-dl和aria2c
+```
+/eqweqwew////.'wewqeqeeqwewqeqwapt
+```
 
 在 HoshinoBot\hoshino\modules 目录下使用以下命令拉取本项目
 ```
