@@ -3,10 +3,6 @@ import typing
 import youtube_dl
 from aiocqhttp.message import MessageSegment
 from hoshino import Service
-from hoshino.util.score import Score
-from hoshino.util.database import (DataBaseException, NotEnoughScoreError,
-                                   ScoreLimitExceededError, database,
-                                   score_data, score_log, init)
 
 
 cool_down = datetime.timedelta(minutes=1)  # 冷却时间
@@ -15,29 +11,9 @@ expire = datetime.timedelta(minutes=2)
 temp = {}
 last_check = {}
 
-async def spend_gold(bot, ev):
-
-	gold = Score(ev) 
-    # 首先实例化类,可以传入CQEvent和CommandSession,对于定时任务,直接传入uid即可
-	try:
-		now_gold = gold.spend_score('5') # 花费积分,其他方法见源码
-		await bot.send(ev, f'你花掉了5 积分，你现在有{now_gold} 积分')
-	except NotEnoughScoreError as e: 
-        # 积分不够花
-        # 判断积分是否够用还可以使用`check_score`方法,这样就不用处理异常
-		await bot.finish(
-            ev, f'你只有{e.args[1]} 积分，不够用于消费')
-        # 从异常信息中获取参数(args1:现有积分数,args2:需要花掉的积分数)
-	except ScoreLimitExceededError as e: 
-        # 积分花太多(没有启用花费上限可以不用处理)
-		await bot.finish(ev, f'你今天已经花了{e.args[0]} 积分了，请明天再来吧')
-	except DataBaseException as e: # 数据库操作失败
-		await bot.finish(ev, f'花费积分失败(Error:{e})，请联系维护组')
-
-
-
-
-
+opt_path = '/root/youtube/' #你的视频下载地址
+aria2c = '/usr/local/bin/aria2c'#你的aria2文件位置
+your_url = 'https://114514.com/' #你的网页下载位置
 sv = Service('下载youtube视频', help_='''
 youtube下载+网页地址
 '''.strip())
@@ -45,7 +21,7 @@ youtube下载+网页地址
 async def search_youtube(youtube_link):
   ydl_opts = {
         'format': 'mp4',
-        'outtmpl': '/www/wwwroot/192.168.0.231/%(id)s.mp4'
+        'outtmpl': f'{opt_path}%(id)s.mp4'
     }
 
   with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -132,7 +108,7 @@ async def qq_download(bot, ev):
  global temp
  key = f'{ev.group_id}-{ev.user_id}'
  if "key" not in temp:
-  await bot.send(ev, '请先发送"油管下载"搜索需要下载的视频哦！')
+  await bot.send(ev, '请先发送"偷视频"搜索需要下载的视频哦！')
  else:
   await spend_gold(bot, ev)
   await bot.send(ev, '请稍等片刻~,视频正在下载中')
@@ -140,8 +116,8 @@ async def qq_download(bot, ev):
   print(url)
   ydl_opts = {
         'format': 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-        'outtmpl': '/www/wwwroot/192.168.0.231/%(id)s.mp4',
-                'external_downloader': '/usr/local/bin/aria2c',
+        'outtmpl': f'{opt_path}%(id)s.mp4',
+                'external_downloader': aria2c,
          'external-downloader-args': '-j 16 -x 16 -s 16 -k 1M'
     }
 
@@ -156,7 +132,7 @@ async def qq_download(bot, ev):
   id = video['id']
   requested_formats = video['requested_formats'][0]['format_note']
   fps = video['requested_formats'][0]['fps']
-  file = '/www/wwwroot/192.168.0.231/' + str(id) +'.mp4'
+  file = f'{opt_path}{id}.mp4'
   print(file)
   mv = '[CQ:video,file=file:'+ str(file) + ']'
   del temp["key"]
@@ -170,16 +146,16 @@ async def web_download(bot, ev):
  global temp
  print(temp)
  if "key" not in temp:
-  await bot.send(ev, '请先发送"油管下载"搜索需要下载的视频哦！')
+  await bot.send(ev, '请先发送"偷视频"搜索需要下载的视频哦！')
  else:
   await spend_gold(bot, ev)
   await bot.send(ev, '请稍等片刻~,视频正在下载中')
   url = temp['youtube_link']
   print(url)
   ydl_opts = {
-        'format': 'bestvideo[filesize<50M]+bestaudio[ext=m4a]/bestvideo+bestaudio',
-        'outtmpl': '/www/wwwroot/192.168.0.231/%(id)s',
-        'external_downloader': '/usr/local/bin/aria2c',
+        'format': 'bestvideo+bestaudio',
+        'outtmpl': f'{opt_path}%(id)s',
+        'external_downloader': aria2c,
          'external-downloader-args': '-j 16 -x 16 -s 16 -k 1M'
     }
 
@@ -195,7 +171,7 @@ async def web_download(bot, ev):
   id = video['id']
   requested_formats = video['requested_formats'][0]['format_note']
   fps = video['requested_formats'][0]['fps']
-  msg = '视频格式为'+ str(requested_formats)+ str(fps) + 'fps\n下载链接为：https://ytdown.bili.moe/'+ str(id) + '.mkv'
+  msg = f'视频格式为{requested_formats}{fps}fps\n下载链接为：{your_url}{id}.mkv'
   del temp["key"]
   del temp["youtube_link"]
   await bot.send(ev, msg)
