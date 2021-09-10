@@ -19,7 +19,7 @@ git clone https://github.com/haha114514/youtube_dl_hoshino.git
 
 然后在 HoshinoBot\\hoshino\\config\\\__bot__.py 文件的 MODULES_ON 加入 youtube_dl_hoshino
 
-修改youtubedown.py里面的 第 14-16行为你指定的参数.
+修改youtubedown.py里面的 第 14-16行 为你指定的参数.
 
 重启 HoshinoBot
 
