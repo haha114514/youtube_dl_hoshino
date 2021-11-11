@@ -27,8 +27,10 @@ git clone https://github.com/haha114514/youtube_dl_hoshino.git
 
 群内发送 偷视频+视频链接（支持YouTube Tiktok Twitter 网易云MV）
 
-等待bot返回视频信息之后，发送 QQ下载 或者 网页下载
+等待bot返回视频信息之后，发送 QQ下载，网页下载 或者 音乐下载
 
 QQ下载即通过QQ文件发送视频
 
 网页下载即发送视频下载网页地址
+
+音乐下载即发送音乐下载网页地址
