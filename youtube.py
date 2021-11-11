@@ -1,6 +1,6 @@
 import datetime
 import typing
-import youtube_dl
+import yt_dlp as youtube_dl
 from aiocqhttp.message import MessageSegment
 from hoshino import Service
 
