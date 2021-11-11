@@ -2,11 +2,11 @@
 Hoshinobot调用YouTube_dl来下载YouTube/Twitter/Tiktok视频
 
 # 安装方法
-安装youtube-dl和aria2c
+安装yt_dlp和aria2c
 ```
-apt/yum install youtube-dl
+apt/yum install yt_dlp
 
-pip/pip3 install youtube-dl
+pip/pip3 install yt_dlp
 
 wget -N git.io/aria2.sh && chmod +x aria2.sh
 
