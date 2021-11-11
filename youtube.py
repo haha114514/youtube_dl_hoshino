@@ -54,7 +54,7 @@ async def fetch_info(bot, ev):
            title = video_info['title']
            uploader = video_info['uploader']
            thumbnail = video_info['thumbnail']
-           msg = '[CQ:image,file='+ str(thumbnail) +']\n标题：' + str(title) + '\n作者：' + str(uploader) +'\n请回复"QQ下载"或者"网页下载"'
+           msg = '[CQ:image,file='+ str(thumbnail) +']\n标题：' + str(title) + '\n作者：' + str(uploader) +'\n请回复"音乐下载","QQ下载"或者"网页下载"'
            key = f'{ev.group_id}-{ev.user_id}'
            temp["key"] = key
            temp["youtube_link"] =  youtube_link    
@@ -67,7 +67,7 @@ async def fetch_info(bot, ev):
            title = video_info['title']
            uploader = video_info['creator']
            thumbnail = video_info['thumbnail']
-           msg = '[CQ:image,file='+ str(thumbnail) +']\n歌名：' + str(title) + '\n作者：' + str(uploader) +'\n请回复"QQ下载"或者"网页下载"'
+           msg = '[CQ:image,file='+ str(thumbnail) +']\n歌名：' + str(title) + '\n作者：' + str(uploader) +'\n请回复"音乐下载","QQ下载"或者"网页下载"'
            key = f'{ev.group_id}-{ev.user_id}'
            temp["key"] = key
            temp["youtube_link"] =  youtube_link    
@@ -80,7 +80,7 @@ async def fetch_info(bot, ev):
            title = video_info['description']
            uploader = video_info['title']
            thumbnail = video_info['thumbnail']
-           msg = '[CQ:image,file='+ str(thumbnail) +']\n标题：' + str(title) + '\n作者：' + str(uploader) +'\n请回复"QQ下载"或者"网页下载"'
+           msg = '[CQ:image,file='+ str(thumbnail) +']\n标题：' + str(title) + '\n作者：' + str(uploader) +'\n请回复"音乐下载","QQ下载"或者"网页下载"'
            key = f'{ev.group_id}-{ev.user_id}'
            temp["key"] = key
            temp["youtube_link"] =  youtube_link    
@@ -92,8 +92,9 @@ async def fetch_info(bot, ev):
            id = video_info['id']
            title = video_info['title']
            uploader = video_info['uploader']
-           thumbnail = 'https://i.ytimg.com/vi/' + str(id) +'/hqdefault.jpg?sqp=-oaymwEZCNACELwBSFXyq4qpAwsIARUAAIhCGAFwAQ==&rs=AOn4CLBTdBfxLI18e8Vv5m2jf8ViQKlD2A'
-           msg = '[CQ:image,file='+ str(thumbnail) +']\n标题：' + str(title) + '\n作者：' + str(uploader) +'\n请回复"QQ下载"或者"网页下载"'
+           thumbnail = video_info['thumbnail'] #webp格式，电脑端显示可能有点问题
+           #thumbnail = 'https://i.ytimg.com/vi/' + str(id) +'/hqdefault.jpg?sqp=-oaymwEZCNACELwBSFXyq4qpAwsIARUAAIhCGAFwAQ==&rs=AOn4CLBTdBfxLI18e8Vv5m2jf8ViQKlD2A'
+           msg = '[CQ:image,file='+ str(thumbnail) +']\n标题：' + str(title) + '\n作者：' + str(uploader) +'\n请回复"音乐下载","QQ下载"或者"网页下载"'
            key = f'{ev.group_id}-{ev.user_id}'
            temp["key"] = key
            temp["youtube_link"] =  youtube_link    
@@ -115,7 +116,7 @@ async def qq_download(bot, ev):
   url = temp['youtube_link']
   print(url)
   ydl_opts = {
-        'format': 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        'format': 'bestvideo[filesize<80m][ext=mp4]+bestaudio[ext=m4a]/best[filesize<80m][ext=mp4]',
         'outtmpl': f'{opt_path}%(id)s.mp4',
                 'external_downloader': aria2c,
          'external-downloader-args': '-j 16 -x 16 -s 16 -k 1M'
@@ -172,6 +173,43 @@ async def web_download(bot, ev):
   requested_formats = video['requested_formats'][0]['format_note']
   fps = video['requested_formats'][0]['fps']
   msg = f'视频格式为{requested_formats}{fps}fps\n下载链接为：{your_url}{id}.mkv'
+  del temp["key"]
+  del temp["youtube_link"]
+  await bot.send(ev, msg)
+  
+  @sv.on_prefix(('音乐下载'))
+async def qq_download(bot, ev):
+ global temp
+ key = f'{ev.group_id}-{ev.user_id}'
+ if "key" not in temp:
+  await bot.send(ev, '请先发送"偷视频"搜索需要下载的视频哦！')
+ else:
+  await spend_gold(bot, ev)
+  await bot.send(ev, '请稍等片刻~,音乐正在下载中')
+  url = temp['youtube_link']
+  print(url)
+  ydl_opts = {
+    'format': 'bestaudio/best',
+    'external_downloader': aria2c,
+    'external-downloader-args': '-j 16 -x 16 -s 16 -k 8M',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '256',
+    }],
+    'outtmpl': f'{opt_path}%(id)s'
+}
+
+  with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        result = ydl.extract_info(url, download=True)
+  if 'entries' in result:
+            # 播放清单
+            video = result['entries'][0]
+  else:
+     # 单个视频
+            video = result           
+  id = video['id']
+  msg = f'音乐下载链接为：{your_url}{id}.mp3'
   del temp["key"]
   del temp["youtube_link"]
   await bot.send(ev, msg)
