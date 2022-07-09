@@ -177,7 +177,7 @@ async def web_download(bot, ev):
   del temp["youtube_link"]
   await bot.send(ev, msg)
   
-  @sv.on_prefix(('音乐下载'))
+@sv.on_prefix(('音乐下载'))
 async def qq_download(bot, ev):
  global temp
  key = f'{ev.group_id}-{ev.user_id}'
