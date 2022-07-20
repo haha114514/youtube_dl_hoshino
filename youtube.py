@@ -111,7 +111,6 @@ async def qq_download(bot, ev):
  if "key" not in temp:
   await bot.send(ev, '请先发送"偷视频"搜索需要下载的视频哦！')
  else:
-  await spend_gold(bot, ev)
   await bot.send(ev, '请稍等片刻~,视频正在下载中')
   url = temp['youtube_link']
   print(url)
@@ -149,7 +148,6 @@ async def web_download(bot, ev):
  if "key" not in temp:
   await bot.send(ev, '请先发送"偷视频"搜索需要下载的视频哦！')
  else:
-  await spend_gold(bot, ev)
   await bot.send(ev, '请稍等片刻~,视频正在下载中')
   url = temp['youtube_link']
   print(url)
@@ -184,7 +182,6 @@ async def qq_download(bot, ev):
  if "key" not in temp:
   await bot.send(ev, '请先发送"偷视频"搜索需要下载的视频哦！')
  else:
-  await spend_gold(bot, ev)
   await bot.send(ev, '请稍等片刻~,音乐正在下载中')
   url = temp['youtube_link']
   print(url)
